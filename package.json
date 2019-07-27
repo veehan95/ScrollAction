@@ -1,0 +1,22 @@
+{
+  "name": "scrollaction",
+  "version": "1.0.0",
+  "description": "detect scroll actions on web page",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "build": "tsc -m commonjs",
+    "example": "tsc &&; node ./example/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tan Vee Han (veehan95@gmail.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/jquery": "^3.3.30",
+    "jquery": "^3.4.1",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "express": "^4.17.1"
+  }
+}
