@@ -1,24 +1,54 @@
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 import $ from 'jquery';
+import { DEFAULTS } from './defaults';
+class GenericEvent {
+    constructor(_eventEmitter, _eventListener, _setting = {}) {
+        this._eventEmitter = _eventEmitter;
+        this._eventListener = _eventListener;
+        this._setting = _setting;
+        this._involvedEvents = [];
+    }
+    get involvedEvents() { return this._involvedEvents; }
+    getEventName(eventName) {
+        return this._setting.preEventName
+            ? `${this._setting.preEventName}-${eventName}`
+            : eventName;
+    }
+    emitter(eventName, details) {
+        this._involvedEvents.push(eventName);
+        this._eventEmitter(this.getEventName(eventName), details);
+        return this;
+    }
+    listener(eventName, callback) {
+        this._eventListener(this.getEventName(eventName), callback);
+        return this;
+    }
+}
 export class ScrollLocation {
-    constructor(parentID) {
+    constructor(el, _setting = {}) {
+        this._setting = _setting;
         this.element = null;
-        if (!$(`#${parentID}`).length)
+        this._elementObject = [];
+        if (!$(el).length)
             throw new Error('Element not found');
-        this.element = $(`#${parentID}`);
-        console.log(this.element);
+        this.element = $(el);
+        this._setting = DEFAULTS;
     }
-    isScrolledIntoViewListener(el, callback) {
+    get elementObject() { return this._elementObject; }
+    createWatcher(element) {
+        if (!$(element).length) {
+            throw new Error(`Element ${element} not found!`);
+        }
+        else {
+            const elementObject = new GenericEvent(this._setting.event.eventEmitter, this._setting.event.eventListener, { preEventName: this._setting.event.eventName });
+            this._elementObject.push(elementObject);
+            return {
+                scrollIntoView: (callback) => this.scrollIntoView(elementObject, callback),
+            };
+        }
     }
-    isScrolledIntoView(el, callback) {
-        return __awaiter(this, void 0, void 0, function* () {
-        });
+    scrollIntoView(elementObject, callback) {
+        elementObject.listener('hi', callback);
+        elementObject.emitter('hi', 'ok');
+        return elementObject;
     }
 }

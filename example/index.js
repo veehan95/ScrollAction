@@ -7,11 +7,18 @@ const app = express()
 const tempjs = fs.readFileSync('build/index.js', 'utf8')
   .split(/\n/)
   .map((line) => {
+    if (/^import/i.test(line) && /\.\//i.test(line)) {
+      const fileName = line.match(/['|"]\.\/(.*)['|"]/)[1];
+      line = fs.readFileSync(`build/${fileName}.js`, 'utf8')
+        .replace('export ', '');
+    }
+
     line = /^import/i.test(line) ? '' : line
     return line = /^export/i.test(line) ? line.replace('export ', '') : line
   })
   .join('\n')
 
+// fs.writeFile('./example/temp.js', tempjs.replace(/\s\s+/g, ''), (err) => {
 fs.writeFile('./example/temp.js', tempjs, (err) => {
     if (err) throw err;
     console.log("The file was succesfully saved!");
