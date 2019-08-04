@@ -1,14 +1,23 @@
 import { ScrollIntoViewElement, Setting, EventFire, ElementCaller, Event } from './type';
 
-export type ScrollLocationOption = {
-//   jQueryElement?: JQuery<Element> | JQuery<HTMLElement>,
-//   element?: Element | HTMLElement,
-//   elementID?: string,
-//   child?: number,
+export interface GenericEventInterface {
+  involvedEvents: string[];
+  emitter(eventName: string, details: any): void;
+  listener(eventName: string, callback: (details: any) => void): void;
+  listenAll(callback: (details: any, eventName?: string) => void): void;
+}
+
+export interface GenericActionInterface {
+  events: GenericEventInterface[];
+  addEvent(): GenericEventInterface;
+  removeEvent(): void;
+  check(): boolean;
+  triggerCheck(): boolean;
 }
 
 export interface ScrollLocationInterface {
-  // isScrolledIntoView(el: ScrollLocationOption, callback: () => void): void
-  // isScrolledIntoViewListener(el: ScrollLocationOption, callback: () => void): any
-  createWatcher(element: string): any // { scrollIntoView: () => Event }
+  targets: GenericActionInterface[];
+  addTarget(element: string): GenericActionInterface;
+  getTarget(element: string): GenericActionInterface;
+  removeTarget(element: string): GenericActionInterface;
 }
