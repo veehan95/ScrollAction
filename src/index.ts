@@ -3,6 +3,12 @@ import { ScrollLocationInterface } from './interface';
 import { ScrollIntoViewElement, Setting, EventFire, ElementCaller, Event, EventEmitter, EventListener } from './type';
 import { DEFAULTS } from './defaults'
 
+class GenericAction {
+  event() {}
+  check() {}
+  trigger() {}
+}
+
 class GenericEvent {
   private _involvedEvents: string[] = [];
   get involvedEvents(): string[] { return this._involvedEvents; }
