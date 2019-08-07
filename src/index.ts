@@ -1,77 +1,48 @@
 import $ from 'jquery';
-import { ScrollLocationInterface } from './interface';
+import { ScrollLocationInterface, GenericActionInterface, GenericEventInterface } from './interface';
 import { ScrollIntoViewElement, Setting, EventFire, ElementCaller, Event, EventEmitter, EventListener } from './type';
 import { DEFAULTS } from './defaults'
-
-class GenericAction {
-  event() {}
-  check() {}
-  trigger() {}
-}
-
-class GenericEvent {
-  private _involvedEvents: string[] = [];
-  get involvedEvents(): string[] { return this._involvedEvents; }
-
-  constructor(private _eventEmitter: EventEmitter, private _eventListener: EventListener, private _setting: { preEventName?: string } = {}) {}
-
-  private getEventName(eventName: string) {
-    return this._setting.preEventName
-      ? `${this._setting.preEventName}-${eventName}`
-      : eventName;
-  }
-
-  emitter(eventName: string, details: any) {
-    this._involvedEvents.push(eventName);
-    this._eventEmitter!(this.getEventName(eventName), details);
-    return this;
-  }
-
-  listener(eventName: string, callback: (details: any) => void) {
-    this._eventListener!(this.getEventName(eventName), callback);
-    return this;
-  }
-
-  listenAll(callback: (details: any, eventName?: string) => void) {
-    this._involvedEvents.forEach((eventName: string) => {
-      this.listener(eventName, (details: any) => { callback(details, eventName) })
-    });
-  }
-}
+import { GenericAction, Actions } from './actions'
 
 export class ScrollLocation implements ScrollLocationInterface {
-  private element: JQuery<Element> | JQuery<HTMLElement> | null = null;
-  private _elementObject: GenericEvent[] = [];
-  get elementObject(): GenericEvent[] { return this._elementObject; }
+  private _parentElement: JQuery<Element> | JQuery<HTMLElement>;
+  get parentElement(): JQuery<Element> | JQuery<HTMLElement> { return this._parentElement};
+
+  private _targets: JQuery<Element>[] | JQuery<HTMLElement>[];
+  get targets(): JQuery<Element>[] | JQuery<HTMLElement>[] { return this._targets};
 
   constructor(el: string, private _setting: Setting = {}) {
     if (!$(el).length) throw new Error('Element not found');
-    this.element = $(el);
+    this._parentElement = $(el);
     this._setting = DEFAULTS;
+    this._targets = [];
   }
 
-  createWatcher(element: string) {
-    if (!$(element).length) {
-      throw new Error(`Element ${element} not found!`)
+  addTarget(el: string): GenericActionInterface {
+    if (!$(el).length) {
+      throw new Error('Element not found');
     } else {
-      const elementObject = new GenericEvent(
-        this._setting!.event!.eventEmitter,
-        this._setting!.event!.eventListener,
-        { preEventName : this._setting!.event!.eventName },
-      )
-      this._elementObject.push(elementObject);
-
-      return {
-        scrollIntoView: (callback: (detail: any) => void) => this.scrollIntoView(elementObject, callback),
-      };
+      this._targets.push($(el));
+      console.log(Actions);
+      return new GenericAction(() => {
+        console.log('addTarget');
+        return true;
+      });
     }
   }
 
-  private scrollIntoView(elementObject: GenericEvent, callback: (detail: any) => void, enableListener: boolean = true): GenericEvent {
-    if (enableListener) elementObject.listener('hi', callback)
-    elementObject.emitter('hi', 'ok')
+  getTarget(element: string): GenericActionInterface {
+    return new GenericAction(() => {
+      console.log('getTarget');
+      return true;
+    });
+  }
 
-    return elementObject;
+  removeTarget(element: string): GenericActionInterface {
+    return new GenericAction(() => {
+      console.log('removeTarget');
+      return true;
+    });
   }
 }
   // scrollIntoViewTrigger(el: string, callback?: () => void) {

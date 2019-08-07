@@ -4,18 +4,39 @@ const fs = require('fs')
 
 const app = express()
 
+function fileProcessor(line) {
+  if (/^import/i.test(line) && /\.\//i.test(line)) {
+    const fileName = line.match(/['|"]\.\/(.*)['|"]/)[1];
+    const exportItems = line.match(/{(.*)}/)[1]
+      .split(',')
+      .map((item) => item.replace(/\s/g, ''));
+    // console.log(exportItems);
+    line = fileProcessor(fs.readFileSync(`build/${fileName}.js`, 'utf8')
+      .split(/\n/)
+      .map((subLine) => {
+        const copy = subLine.split(/\s/)
+          .map((word) => exportItems.includes(word))
+          .includes(true)
+        if (copy) {
+          if (subLine.includes('{')) {
+
+          }
+          console.log(subLine.includes('{'))
+        }
+        return subLine;
+      })
+      .join('\n')
+      .replace(/export /g, ''));
+    // console.log(line);
+  }
+
+  line = /^import/i.test(line) ? '' : line
+  return line = /^export/i.test(line) ? line.replace('export ', '') : line
+};
+
 const tempjs = fs.readFileSync('build/index.js', 'utf8')
   .split(/\n/)
-  .map((line) => {
-    if (/^import/i.test(line) && /\.\//i.test(line)) {
-      const fileName = line.match(/['|"]\.\/(.*)['|"]/)[1];
-      line = fs.readFileSync(`build/${fileName}.js`, 'utf8')
-        .replace('export ', '');
-    }
-
-    line = /^import/i.test(line) ? '' : line
-    return line = /^export/i.test(line) ? line.replace('export ', '') : line
-  })
+  .map(fileProcessor)
   .join('\n')
 
 // fs.writeFile('./example/temp.js', tempjs.replace(/\s\s+/g, ''), (err) => {

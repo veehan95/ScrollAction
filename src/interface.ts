@@ -1,4 +1,4 @@
-import { ScrollIntoViewElement, Setting, EventFire, ElementCaller, Event } from './type';
+import { ScrollIntoViewElement, Setting, EventFire, ElementCaller, Event, EventEmitter, EventListener } from './type';
 
 export interface GenericEventInterface {
   involvedEvents: string[];
@@ -9,14 +9,14 @@ export interface GenericEventInterface {
 
 export interface GenericActionInterface {
   events: GenericEventInterface[];
-  addEvent(): GenericEventInterface;
+  addEvent(eventEmitter: EventEmitter, eventListener: EventListener): GenericEventInterface;
   removeEvent(): void;
   check(): boolean;
   triggerCheck(): boolean;
 }
 
 export interface ScrollLocationInterface {
-  targets: GenericActionInterface[];
+  targets: JQuery<Element>[] | JQuery<HTMLElement>[];
   addTarget(element: string): GenericActionInterface;
   getTarget(element: string): GenericActionInterface;
   removeTarget(element: string): GenericActionInterface;
